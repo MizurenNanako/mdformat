@@ -85,4 +85,14 @@ module Tokens = struct
       | T_space c -> a c
     ;;
   end
+
+  type t =
+    | Text of MDText.token
+    | Code of MDCode.token
+    | Math of MDMath.token
+  
+  let add2buffer buf = function
+  | Text x -> MDText.add2buffer buf x
+  | Code x -> MDCode.add2buffer buf x
+  | Math x -> MDMath.add2buffer buf x
 end

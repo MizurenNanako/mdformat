@@ -82,4 +82,15 @@ module Lex = struct
     | any -> T_code (getch 1)
     | _ -> assert false
   ;;
+
+  type tok_state =
+    | InCode
+    | InText
+    | InMath
+
+  let get_token lexbuf = function
+    | InText -> Mdtoken.Tokens.Text (tok_text lexbuf)
+    | InCode -> Mdtoken.Tokens.Code (tok_code lexbuf)
+    | InMath -> Mdtoken.Tokens.Math (tok_math lexbuf)
+  ;;
 end
