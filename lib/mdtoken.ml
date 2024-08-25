@@ -42,13 +42,14 @@ module Tokens = struct
     type token =
       | T_dollor (* $ 刀乐 *)
       | T_ddollor (* $$ 双刀乐 *)
-      | T_cmd of Uchar.t (* \... 指令 *)
+      | T_cmd of string (* \... 指令 *)
       | T_num of Uchar.t (* 数字 *)
       | T_word of Uchar.t (* 普通字符（utf8） *)
       | T_lc (* { 开括号 *)
       | T_rc (* } 闭括号 *)
       | T_punct of Uchar.t (* 运算符 *)
       | T_space
+      | T_cr
 
     let add2buffer buf =
       let a = Buffer.add_utf_8_uchar buf in
@@ -56,13 +57,14 @@ module Tokens = struct
       function
       | T_dollor -> b "$"
       | T_ddollor -> b "$$"
-      | T_cmd c -> a c
+      | T_cmd c -> Buffer.add_string buf c
       | T_num c -> a c
       | T_word c -> a c
       | T_lc -> b "{"
       | T_rc -> b "}"
       | T_punct c -> a c
       | T_space -> b " "
+      | T_cr -> b "\n"
     ;;
   end
 

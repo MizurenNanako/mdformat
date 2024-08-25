@@ -36,18 +36,18 @@ module Lex = struct
     let open Mdtoken.Tokens.MDText in
     let getch = Sedlexing.lexeme_char lexbuf in
     match%sedlex lexbuf with
-    | zh -> T_zh (getch 1)
-    | en -> T_eng (getch 1)
+    | zh -> T_zh (getch 0)
+    | en -> T_eng (getch 0)
     | space -> T_space
     | cr -> T_cr
-    | num -> T_num (getch 1)
-    | punct -> T_punct (getch 1)
-    | dl -> T_dollor
+    | num -> T_num (getch 0)
     | ddl -> T_ddollor
-    | bt -> T_backtick
+    | dl -> T_dollor
     | tbt -> T_tbacktick
+    | bt -> T_backtick
+    | punct -> T_punct (getch 0)
     | eof -> T_eof
-    | any -> T_other (getch 1)
+    | any -> T_other (getch 0)
     | _ -> assert false
   ;;
 
@@ -58,15 +58,18 @@ module Lex = struct
     let open Mdtoken.Tokens.MDMath in
     let getch = Sedlexing.lexeme_char lexbuf in
     match%sedlex lexbuf with
+    | "\\$" -> T_word (getch 0)
     | dl -> T_dollor
     | ddl -> T_ddollor
-    | cmd -> T_cmd (getch 1)
-    | num -> T_num (getch 1)
+    | cmd -> T_cmd (Sedlexing.Utf8.lexeme lexbuf)
+    | num -> T_num (getch 0)
     | "{" -> T_lc
     | "}" -> T_rc
-    | en_punct -> T_punct (getch 1)
+    | en_punct -> T_punct (getch 0)
     | eof -> raise @@ Failure "unexpected eof in math mode"
-    | any -> T_word (getch 1)
+    | space -> T_space
+    | Plus cr -> T_cr
+    | any -> T_word (getch 0)
     | _ -> assert false
   ;;
 
@@ -77,20 +80,47 @@ module Lex = struct
     | bt -> T_backtick
     | tbt -> T_tbacktick
     | cr -> T_cr
-    | space -> T_space (getch 1)
+    | space -> T_space (getch 0)
     | eof -> raise @@ Failure "unexpected eof in code mode"
-    | any -> T_code (getch 1)
+    | any -> T_code (getch 0)
     | _ -> assert false
   ;;
 
   type tok_state =
-    | InCode
     | InText
-    | InMath
+    | InCode of bool
+    | InMath of bool
 
-  let get_token lexbuf = function
-    | InText -> Mdtoken.Tokens.Text (tok_text lexbuf)
-    | InCode -> Mdtoken.Tokens.Code (tok_code lexbuf)
-    | InMath -> Mdtoken.Tokens.Math (tok_math lexbuf)
+  let get_token lexbuf =
+    let state = ref InText in
+    let getter () =
+      match !state with
+      | InText ->
+        let tok = tok_text lexbuf in
+        (match tok with
+         | T_dollor -> state := InMath false
+         | T_ddollor -> state := InMath true
+         | T_backtick -> state := InCode false
+         | T_tbacktick -> state := InCode true
+         | _ -> ());
+        Mdtoken.Tokens.Text tok
+      | InCode display ->
+        let tok = tok_code lexbuf in
+        (match tok with
+         | T_backtick -> if display then () else state := InText
+         | T_tbacktick ->
+           if display then state := InText else raise @@ Failure "unmatched fence"
+         | _ -> ());
+        Mdtoken.Tokens.Code tok
+      | InMath display ->
+        let tok = tok_math lexbuf in
+        (match tok with
+         | T_dollor -> if display then () else state := InText
+         | T_ddollor ->
+           if display then state := InText else raise @@ Failure "unmatched fence"
+         | _ -> ());
+        Mdtoken.Tokens.Math tok
+    in
+    getter, fun () -> !state
   ;;
 end
