@@ -1,2 +1,10 @@
 (library
- (name mdformat))
+ (name mdlexer)
+ (modules mdlexer)
+ (preprocess
+  (pps sedlex.ppx))
+ (libraries sedlex sedlex.ppx mdtoken))
+
+(library
+ (name mdtoken)
+ (modules mdtoken))
