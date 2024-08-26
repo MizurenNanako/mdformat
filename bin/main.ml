@@ -14,10 +14,9 @@ module M = Mdtoken.Tokens.MDMath
 
 let () =
   let lexer =
-    Sys.argv.(1)
-    |> In_channel.open_text
-    |> Sedlexing.Utf8.from_channel
-    |> Mdlexer.Lex.get_token
+    (* Sys.argv.(1)
+       |> In_channel.open_text *)
+    stdin |> Sedlexing.Utf8.from_channel |> Mdlexer.Lex.get_token
   in
   let buf = Buffer.create 17 in
   let tmp = Mdtoken.Tokens.add2buffer buf in
