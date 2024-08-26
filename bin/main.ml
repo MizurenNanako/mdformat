@@ -47,7 +47,7 @@ let () =
        | Math M.T_space, Math M.T_space
        | Math M.T_space, Math M.T_lc
        | Math M.T_space, Math M.T_rc
-       | Math M.T_space, Math M.T_cr
+       | Math M.T_space, Math (M.T_cr _)
        | Math M.T_space, Math (M.T_num _) -> cur_tok |> loop
        | Math M.T_space, Math _ ->
          if !dirty_state

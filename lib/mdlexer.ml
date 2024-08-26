@@ -68,7 +68,7 @@ module Lex = struct
     | en_punct -> T_punct (getch 0)
     | eof -> raise @@ Failure "unexpected eof in math mode"
     | space -> T_space
-    | Plus cr -> T_cr
+    | Plus cr, Star space -> T_cr (Sedlexing.lexeme_length lexbuf - 1)
     | any -> T_word (getch 0)
     | _ -> assert false
   ;;

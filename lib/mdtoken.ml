@@ -49,7 +49,7 @@ module Tokens = struct
       | T_rc (* } 闭括号 *)
       | T_punct of Uchar.t (* 运算符 *)
       | T_space
-      | T_cr
+      | T_cr of int
 
     let add2buffer buf =
       let a = Buffer.add_utf_8_uchar buf in
@@ -64,7 +64,9 @@ module Tokens = struct
       | T_rc -> b "}"
       | T_punct c -> a c
       | T_space -> b " "
-      | T_cr -> b "\n"
+      | T_cr n ->
+        b "\n";
+        String.make n ' ' |> b
     ;;
   end
 
@@ -92,9 +94,10 @@ module Tokens = struct
     | Text of MDText.token
     | Code of MDCode.token
     | Math of MDMath.token
-  
+
   let add2buffer buf = function
-  | Text x -> MDText.add2buffer buf x
-  | Code x -> MDCode.add2buffer buf x
-  | Math x -> MDMath.add2buffer buf x
+    | Text x -> MDText.add2buffer buf x
+    | Code x -> MDCode.add2buffer buf x
+    | Math x -> MDMath.add2buffer buf x
+  ;;
 end
