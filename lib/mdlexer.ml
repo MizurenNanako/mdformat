@@ -47,7 +47,7 @@ module Lex = struct
     | bt -> T_backtick
     | punct -> T_punct (getch 0)
     | eof -> T_eof
-    | any -> T_other (getch 0)
+    | any -> T_other (Sedlexing.Utf8.lexeme lexbuf)
     | _ -> assert false
   ;;
 
@@ -93,7 +93,7 @@ module Lex = struct
 
   let get_token lexbuf =
     let state = ref InText in
-    let getter () =
+    fun () ->
       match !state with
       | InText ->
         let tok = tok_text lexbuf in
@@ -120,7 +120,5 @@ module Lex = struct
            if display then state := InText else raise @@ Failure "unmatched fence"
          | _ -> ());
         Mdtoken.Tokens.Math tok
-    in
-    getter, fun () -> !state
   ;;
 end

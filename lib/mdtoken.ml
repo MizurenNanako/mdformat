@@ -16,7 +16,7 @@ module Tokens = struct
          | T_closetag of Uchar.t (* </...> html 闭标签 *)
          | T_isotag of Uchar.t (* <.../> html 自闭标签 *)
       *)
-      | T_other of Uchar.t (* 其他情况 *)
+      | T_other of string (* 其他情况 *)
       | T_eof (* EOF *)
 
     let add2buffer buf =
@@ -33,7 +33,7 @@ module Tokens = struct
       | T_ddollor -> b "$$"
       | T_backtick -> b "`"
       | T_tbacktick -> b "```"
-      | T_other c -> a c
+      | T_other c -> b c
       | T_eof -> ()
     ;;
   end
