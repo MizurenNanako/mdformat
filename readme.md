@@ -114,7 +114,7 @@ cat readme.md | dune exec mdformat | diff readme.md -
 76c76
 < 使 $\dfrac A { x ^ { 2 } } + \dfrac { B } { 1 + x ^ { 2 } } = \dfrac { 1 } { x ^ { 2 } \left ( 1 + x ^ { 2 } \right ) } $，待定系数：
 ---
-> 使 $\dfrac A{x^{2}}+\dfrac{B}{1+x^{2}}=\dfrac{1}{x^{2}\left (1+x^{2}\right )}$，待定系数：
+> 使 $\dfrac A{x^{2}}+\dfrac{B}{1+x^{2}}=\dfrac{1}{x^{2}\left(1+x^{2}\right)}$，待定系数：
 82,84c82,84
 <         y   y' & = f(x) \\
 <         y + y' & = g(x) \\
@@ -128,8 +128,8 @@ cat readme.md | dune exec mdformat | diff readme.md -
 <         \ln y + \ln (y') & = g(x) \\
 <     \end{cases} \\
 ---
->         \ln y\ln (y')&=f(x)\\
->         \ln y+\ln (y')&=g(x)\\
+>         \ln y\ln(y')&=f(x)\\
+>         \ln y+\ln(y')&=g(x)\\
 >     \end{cases}\\
 
 ```
