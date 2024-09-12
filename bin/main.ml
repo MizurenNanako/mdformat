@@ -21,7 +21,9 @@ let () =
   let buf = Buffer.create 17 in
   let tmp = Mdtoken.Tokens.add2buffer buf in
   let rec loop dirty_state last_tok =
-    match lexer () with
+    let tk = lexer () in
+    (* Mdtoken.Tokens.debug tk; *)
+    match tk with
     | Text T_eof -> tmp last_tok
     | cur_tok ->
       (match last_tok, cur_tok with
