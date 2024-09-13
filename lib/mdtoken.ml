@@ -13,7 +13,7 @@ module Tokens = struct
       | T_zh of uchar (* 中文字符 *)
       | T_eng of uchar (* 英文字符 *)
       | T_space (* 空白字符 *)
-      | T_cr (* 换行符 *)
+      | T_cr of int (* 换行符 *)
       | T_num of uchar (* 数字 *)
       | T_punct of uchar (* 标点字符 *)
       | T_dollor (* $ 刀乐 *)
@@ -38,7 +38,9 @@ module Tokens = struct
       | T_zh c -> a c
       | T_eng c -> a c
       | T_space -> b " "
-      | T_cr -> b "\n"
+      | T_cr n ->
+        b "\n";
+        String.make n ' ' |> b
       | T_num c -> a c
       | T_punct c -> a c
       | T_dollor -> b "$"

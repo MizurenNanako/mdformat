@@ -69,7 +69,7 @@ module Lex = struct
     | zh -> T_zh (getch 0)
     | en -> T_eng (getch 0)
     | space -> T_space
-    | cr -> T_cr
+    | cr, Star space -> T_cr (Sedlexing.lexeme_length lexbuf - 1)
     | num -> T_num (getch 0)
     | ddl -> T_ddollor
     | dl -> T_dollor

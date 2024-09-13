@@ -22,21 +22,21 @@ let () =
   let tmp = Mdtoken.Tokens.add2buffer buf in
   let rec loop dirty_state last_tok =
     let tk = lexer () in
-    (* Mdtoken.Tokens.debug tk; *)
+    Mdtoken.Tokens.debug tk;
     match tk with
     | Text T_eof -> tmp last_tok
     | cur_tok ->
       (match last_tok, cur_tok with
        (* pangu *)
-       | Text T.T_space, Text T.T_cr | Text T.T_space, Text T.T_space ->
+       | Text T.T_space, Text (T.T_cr _) | Text T.T_space, Text T.T_space ->
          cur_tok |> loop dirty_state
        | Text (T.T_zh _), Text (T.T_zh _)
        | Text (T.T_zh _), Text (T.T_punct _)
        | Text (T.T_zh _), Text T.T_space
-       | Text (T.T_zh _), Text T.T_cr
+       | Text (T.T_zh _), Text (T.T_cr _)
        | Text (T.T_punct _), Text (T.T_zh _)
        | Text T.T_space, Text (T.T_zh _)
-       | Text T.T_cr, Text (T.T_zh _) ->
+       | Text (T.T_cr _), Text (T.T_zh _) ->
          last_tok |> tmp;
          cur_tok |> loop dirty_state
        | Text (T.T_zh _), _ | _, Text (T.T_zh _) ->
