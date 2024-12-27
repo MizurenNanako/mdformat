@@ -19,6 +19,7 @@ module Tokens = struct
       | T_dollor (* $ 刀乐 *)
       | T_ddollor (* $$ 双刀乐 *)
       | T_backtick (* ` 背踢 *)
+      | T_dbacktick (* `` 背踢 *)
       | T_tbacktick (* ``` 三背踢 *)
       (*
          | T_opentag of uchar (* <...> html 开标签 *)
@@ -46,6 +47,7 @@ module Tokens = struct
       | T_dollor -> b "$"
       | T_ddollor -> b "$$"
       | T_backtick -> b "`"
+      | T_dbacktick -> b "``"
       | T_tbacktick -> b "```"
       | T_other c -> b c
       | T_eof -> ()
@@ -90,6 +92,7 @@ module Tokens = struct
   module MDCode = struct
     type token =
       | T_backtick (* ` backtick *)
+      | T_dbacktick (* ` backtick *)
       | T_tbacktick (* ``` triple backtick *)
       | T_cr (* 换行符 *)
       | T_code of uchar (* 普通字符 *)
@@ -103,6 +106,7 @@ module Tokens = struct
       let b = Buffer.add_string buf in
       function
       | T_backtick -> b "`"
+      | T_dbacktick -> b "``"
       | T_tbacktick -> b "```"
       | T_cr -> b "\n"
       | T_code c -> a c

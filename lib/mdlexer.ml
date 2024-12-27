@@ -56,6 +56,7 @@ module Lex = struct
   let cr = [%sedlex.regexp? '\n']
   let dl = [%sedlex.regexp? "$"]
   let bt = [%sedlex.regexp? "`"]
+  let dbt = [%sedlex.regexp? "``"]
   let ddl = [%sedlex.regexp? "$$"]
   let tbt = [%sedlex.regexp? "```"]
   let punct = [%sedlex.regexp? zh_punct | en_punct]
@@ -75,6 +76,7 @@ module Lex = struct
     | dl -> T_dollor
     | tbt -> T_tbacktick
     | bt -> T_backtick
+    | dbt -> T_dbacktick
     | punct -> T_punct (getch 0)
     | eof -> T_eof
     | any -> T_other (Sedlexing.Utf8.lexeme lexbuf)
@@ -108,6 +110,7 @@ module Lex = struct
     let getch = Sedlexing.lexeme_char lexbuf in
     match%sedlex lexbuf with
     | bt -> T_backtick
+    | dbt -> T_dbacktick
     | tbt -> T_tbacktick
     | cr -> T_cr
     | space -> T_space (getch 0)
@@ -118,8 +121,13 @@ module Lex = struct
 
   type tok_state =
     | InText
-    | InCode of bool
+    | InCode of codestate
     | InMath of bool
+
+  and codestate =
+    | OneTick
+    | TwoTick
+    | ThreeTick
 
   let get_token lexbuf =
     let state = ref InText in
@@ -130,16 +138,17 @@ module Lex = struct
         (match tok with
          | T_dollor -> state := InMath false
          | T_ddollor -> state := InMath true
-         | T_backtick -> state := InCode false
-         | T_tbacktick -> state := InCode true
+         | T_backtick -> state := InCode OneTick
+         | T_dbacktick -> state := InCode TwoTick
+         | T_tbacktick -> state := InCode ThreeTick
          | _ -> ());
         Mdtoken.Tokens.Text tok
-      | InCode display ->
+      | InCode tickCnt ->
         let tok = tok_code lexbuf in
         (match tok with
-         | T_backtick -> if display then () else state := InText
-         | T_tbacktick ->
-           if display then state := InText else raise @@ Failure "unmatched fence"
+         | T_backtick when tickCnt = OneTick -> state := InText
+         | T_dbacktick when tickCnt = TwoTick -> state := InText
+         | T_tbacktick when tickCnt = ThreeTick -> state := InText
          | _ -> ());
         Mdtoken.Tokens.Code tok
       | InMath display ->
